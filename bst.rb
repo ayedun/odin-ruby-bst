@@ -48,50 +48,101 @@ class Bst
         
     end
 
-    def delete(value, current_node = @root, state = false)
+    def find_next_biggest_node_and_pre(value, current_node = @root)
+        if value > current_node.data
+        delete(value, current_node.is_right) unless current_node.is_right.nil?
+        p current_node.data
+        elsif value < current_node.data
+        delete(value, current_node.is_left) unless current_node.is_left.nil?
+        p current_node.data
+        end
+    end
+
+
+    def find_next_biggest_node_and_pre(current_node, next_biggest_node = nil, pre_next_biggest_node = nil)
+        result = []
+        if current_node.nil?
+            return
+        elsif current_node.is_left.nil?
+                next_biggest_node = current_node
+        elsif current_node.is_left.is_left.nil?
+            
+            next_biggest_node = current_node.is_left
+            pre_next_biggest_node = current_node.is_right
+        else
+            find_next_biggest_node_and_pre(current_node.is_left) unless current_node.is_left.nil?
+            if current_node.is_left.nil?
+                next_biggest_node = current_node
+                
+                
+            end
+        end
+        result[0] = next_biggest_node
+        result[1] = pre_next_biggest_node
+        return result #0 is next_biggest. #1 is previous
+        
+    
+    end
+
+
+
+
+
+
+
+
+    def delete(value, current_node = @root, state = false, pre_next_biggest_node = nil)
+ 
+
+        
+        
+
+
+
         if value == current_node.data
+           
             state = true
             p "found ya"
             if !(current_node.is_right.nil?) && !(current_node.is_left.nil?)
                 p " both kids"
-                current_node.data = find_next_biggest_node(current_node)
-                
-
-                return 
+                next_biggest_node_and_pre = find_next_biggest_node_and_pre(current_node.is_right)
+                next_biggest_node= next_biggest_node_and_pre[0]
+                pre_next_biggest_node = next_biggest_node_and_pre[1]
+                current_node.data = next_biggest_node.data
+                if next_biggest_node.is_right != nil
+                    pre_next_biggest_node.is_left = next_biggest_node.is_right
+                    
+                end 
             elsif current_node.is_right.nil? && current_node.is_left.nil?
                 p"both no kids"
-                return
+                current_node.data = nil
             else 
-                current_node.is_right.nil? ? (p "right no kids") : (p "left no kids")
-                return
+                current_node.is_right.nil? ? side = "left" : (side = "right")
+                if side == "left"
+                    current_node.data =current_node.is_left.data
+                    current_node.is_left =current_node.is_left.is_left unless current_node.is_left.nil?
+                    current_node.is_right = current_node.is_left.is_right unless current_node.is_left.nil?
+                    
+                
+
+                elsif side == "right"
+                    current_node.data =current_node.is_right.data
+                    current_node.is_left =current_node.is_right.is_left unless current_node.is_right.nil?
+                    current_node.is_right = current_node.is_right.is_right unless current_node.is_right.nil?
+
+                end
             end
-
             return
-
-
-
-
-
-
-
-
-
-
-
-
-
         elsif value > current_node.data
-            delete(value, current_node.is_right) unless current_node.is_right.nil?
+            delete(value, current_node.is_right, pre_next_biggest_node) unless current_node.is_right.nil?
             p current_node.data
         elsif value < current_node.data
-            delete(value, current_node.is_left) unless current_node.is_left.nil?
+            delete(value, current_node.is_left, pre_next_biggest_node) unless current_node.is_left.nil?
             p current_node.data
         end
-
         if !state
             return state
         end
-
     end
     
 
@@ -106,7 +157,9 @@ tree.insert(6)
 p "after insert"
 
 tree.pretty_print
-if !(tree.delete(7))
+if !(tree.delete(67))
     p "Didn't find ya"
 end
 
+p "after delete"
+tree.pretty_print
