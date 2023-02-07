@@ -157,9 +157,10 @@ tree.insert(6)
 p "after insert"
 
 tree.pretty_print
-if !(tree.delete(67))
-    p "Didn't find ya"
-end
 
-p "after delete"
-tree.pretty_print
+# if !(tree.delete(67))
+#     p "Didn't find ya"
+# end
+
+# p "after delete"
+# tree.pretty_print
