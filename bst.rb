@@ -22,7 +22,7 @@ class Bst
 
     end
     def pretty_print(node = @root, prefix = '', is_left = true)
-        pretty_print(node.is_right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.is_right
+        pretty_print(node.is_right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.is_right 
         puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
         pretty_print(node.is_left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.is_left
     end
@@ -48,47 +48,15 @@ class Bst
         
     end
 
-    def find_next_biggest_node_and_pre(value, current_node = @root)
-        if value > current_node.data
-        delete(value, current_node.is_right) unless current_node.is_right.nil?
-        p current_node.data
-        elsif value < current_node.data
-        delete(value, current_node.is_left) unless current_node.is_left.nil?
-        p current_node.data
-        end
-    end
 
 
-    def find_next_biggest_node_and_pre(current_node, next_biggest_node = nil, pre_next_biggest_node = nil)
-        result = []
-        if current_node.nil?
-            return
-        elsif current_node.is_left.nil?
-                next_biggest_node = current_node
-        elsif current_node.is_left.is_left.nil?
-            
-            next_biggest_node = current_node.is_left
-            pre_next_biggest_node = current_node.is_right
-        else
-            find_next_biggest_node_and_pre(current_node.is_left) unless current_node.is_left.nil?
-            if current_node.is_left.nil?
-                next_biggest_node = current_node
-                
-                
-            end
-        end
-        result[0] = next_biggest_node
-        result[1] = pre_next_biggest_node
-        return result #0 is next_biggest. #1 is previous
+
+    def leftmost_leaf(node)
         
+        node = node.is_left until node.is_left.nil?
     
+        node
     end
-
-
-
-
-
-
 
 
     def delete(value, current_node = @root, state = false, pre_next_biggest_node = nil)
@@ -100,37 +68,83 @@ class Bst
 
 
         if value == current_node.data
-           
             state = true
             p "found ya"
             if !(current_node.is_right.nil?) && !(current_node.is_left.nil?)
-                p " both kids"
-                next_biggest_node_and_pre = find_next_biggest_node_and_pre(current_node.is_right)
-                next_biggest_node= next_biggest_node_and_pre[0]
-                pre_next_biggest_node = next_biggest_node_and_pre[1]
-                current_node.data = next_biggest_node.data
-                if next_biggest_node.is_right != nil
-                    pre_next_biggest_node.is_left = next_biggest_node.is_right
-                    
-                end 
+                p " both kids"  
+                leftmost_node = leftmost_leaf(current_node.is_right)
+                current_node.data = leftmost_node.data
+                delete(leftmost_node.data, current_node.is_right)
+
+
+
+
             elsif current_node.is_right.nil? && current_node.is_left.nil?
                 p"both no kids"
                 current_node.data = nil
+
+
+
+
+
+
+
+
+
+
+
             else 
-                current_node.is_right.nil? ? side = "left" : (side = "right")
+                current_node.is_right.nil? ? (side = "left") : (side = "right")
+
                 if side == "left"
                     current_node.data =current_node.is_left.data
-                    current_node.is_left =current_node.is_left.is_left unless current_node.is_left.nil?
-                    current_node.is_right = current_node.is_left.is_right unless current_node.is_left.nil?
+                    current_node.is_left =current_node.is_left.is_left unless !(current_node.is_left.is_left)
+                    current_node.is_right = current_node.is_left.is_right unless !(current_node.is_left.is_right)
+                   
+                    if (current_node.is_left.is_right == nil)
+                        current_node.is_right = nil
+                    end
+
+                    if (current_node.is_left.is_left == nil)
+                        current_node.is_left = nil
+                    end
+                    return
                     
                 
-
+                
+                
                 elsif side == "right"
-                    current_node.data =current_node.is_right.data
-                    current_node.is_left =current_node.is_right.is_left unless current_node.is_right.nil?
-                    current_node.is_right = current_node.is_right.is_right unless current_node.is_right.nil?
+                    current_node.data = current_node.is_right.data
+                    p current_node.is_right.is_left
+                    current_node.is_left = current_node.is_right.is_left unless !(current_node.is_right.is_left)
+                    current_node.is_right = current_node.is_right.is_right unless !(current_node.is_right.is_right)
+                    p current_node
+                    if (current_node.is_right.is_left == nil)
+                        current_node.is_left = nil
+                    end
+                    if (current_node.is_right.is_right == nil)
+                        current_node.is_right = nil
+                    end
+                    p current_node
+                 
 
+                    return
+                
+                
+                
+                
                 end
+
+
+
+
+
+
+
+
+
+                
+            
             end
             return
         elsif value > current_node.data
@@ -158,9 +172,9 @@ p "after insert"
 
 tree.pretty_print
 
-# if !(tree.delete(67))
-#     p "Didn't find ya"
-# end
+if !(tree.delete(4))
+    p "Didn't find ya"
+end
 
-# p "after delete"
-# tree.pretty_print
+p "after delete"
+tree.pretty_print
