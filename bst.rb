@@ -258,8 +258,12 @@ class Bst
     end
 
     def balanced?(current_node = @root)
-        
-        return true if current_node.is_left.nil? || current_node.is_right.nil?           #CHANGE THESE TO MATCH ONLINE
+        #Continue heading down nodes until it reaches a node with 1 or 0 children
+        #It will return true until it comes back to a node with 2 children.
+        #The node with 2 children will now be tested for height of the left and right child.
+        #If there is a false at any point, then ALL future conditions will be false, otherwise it is true and balanced
+
+        return true if current_node.is_left.nil? || current_node.is_right.nil?          
         
         return true if balanced?(current_node.is_left) &&
                        balanced?(current_node.is_right) &&
