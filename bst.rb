@@ -32,17 +32,16 @@ class Bst
     #insert a value into the tree   
     def insert(value, current_node = @root)
         if current_node.nil? #If current tree is nil(empty), insert
-            p current_node
             return false
         elsif value > current_node.data #If value is greater than current, go to right node recursively
             if !(insert(value, current_node.is_right))
                 current_node.is_right = Node.new(value)
-                p current_node.data 
+                # p current_node.data 
             end
         elsif value < current_node.data #if value is smaller than current, go to left node recursively
             if !(insert(value, current_node.is_left))
                 current_node.is_left = Node.new(value)
-                p current_node.data
+                # p current_node.data
             end
         end
         return true      #Reset the boolean or else it will not work
@@ -52,7 +51,10 @@ class Bst
     end
 
     def find(value, current_node = @root)
-        if value == current_node.data || current_node.nil?
+        if current_node.nil? 
+            return 
+        end#If current tree is nil(empty
+        if value == current_node.data
             return current_node
         elsif value < current_node.data
             find(value, current_node.is_left)
@@ -86,7 +88,7 @@ class Bst
             state = true
             #Case 1: node has both is_left and is_right
             if !(current_node.is_right.nil?) && !(current_node.is_left.nil?)
-                p " both kids"  
+                 
                 leftmost_node = leftmost_leaf(current_node.is_right)
                 current_node.data = leftmost_node.data
                 delete(leftmost_node.data, current_node.is_right)
@@ -95,7 +97,7 @@ class Bst
 
             #case 2: node has neither is_left nor is_right
             elsif current_node.is_right.nil? && current_node.is_left.nil?
-                p"both no kids"
+                
                 current_node.data = nil
 
 
@@ -130,17 +132,15 @@ class Bst
                 
                 elsif side == "right"
                     current_node.data = current_node.is_right.data
-                    p current_node.is_right.is_left
                     current_node.is_left = current_node.is_right.is_left unless !(current_node.is_right.is_left)
                     current_node.is_right = current_node.is_right.is_right unless !(current_node.is_right.is_right)
-                    p current_node
                     if (current_node.is_right.is_left == nil)
                         current_node.is_left = nil
                     end
                     if (current_node.is_right.is_right == nil)
                         current_node.is_right = nil
                     end
-                    p current_node
+                    
                  
 
                     return
@@ -164,10 +164,8 @@ class Bst
             return
         elsif value > current_node.data
             delete(value, current_node.is_right, pre_next_biggest_node) unless current_node.is_right.nil?
-            p current_node.data
         elsif value < current_node.data
             delete(value, current_node.is_left, pre_next_biggest_node) unless current_node.is_left.nil?
-            p current_node.data
         end
         if !state
             return state
@@ -195,10 +193,22 @@ class Bst
     end
 
 
-    def preorder(current_node = @root)
-        print "#{current_node.data}, "
-        preorder(current_node.is_left) unless current_node.is_left.nil?
-        preorder(current_node.is_right) unless current_node.is_right.nil?
+    def preorder(current_node = @root, create_array = false, array = [])
+        if create_array == true
+                            
+            array<< current_node.data
+            print "#{current_node.data}, "
+            preorder(current_node.is_left, true, array) unless current_node.is_left.nil?
+            preorder(current_node.is_right, true, array) unless current_node.is_right.nil?
+            return array
+        
+        else
+            print "#{current_node.data}, "
+            preorder(current_node.is_left) unless current_node.is_left.nil?
+            preorder(current_node.is_right) unless current_node.is_right.nil?
+
+        end
+
 
     end
 
@@ -209,18 +219,15 @@ class Bst
     end 
 
     def height(value, current_node = @root, matched_node = current_node)
-        if value == current_node.data || current_node.nil?
+        if current_node.nil?
+            return
+        end
+        if value == current_node.data
 
             left_height = matched_node.is_left.nil? ? 0 : height(value, current_node, matched_node.is_left)
             right_height = matched_node.is_right.nil? ? 0 : height(value, current_node, matched_node.is_right)
             return left_height > right_height ? left_height + 1 : right_height + 1
-
-
-
-
-
-            left_height >= right_height ? (p "The height of the node is #{left_height}") : (p "The height of the node is #{right_height}")
-            return current_node
+            # return current_node
         elsif value < current_node.data
             
             height(value, current_node.is_left)
@@ -232,33 +239,40 @@ class Bst
 
         
     end
+    def depth(value, current_node = @root, depth = 1)
+        if value == current_node.data || current_node.nil?
+            
+            
+            
+            return depth
+        elsif value < current_node.data
+            
+            height(value, current_node.is_left, depth + 1)
+        elsif value > current_node.data
+            
+            height(value, current_node.is_right, depth + 1)
 
+        end
 
+        
+    end
 
+    def balanced?(current_node = @root)
+        
+        return true if current_node.is_left.nil? || current_node.is_right.nil?           #CHANGE THESE TO MATCH ONLINE
+        
+        return true if balanced?(current_node.is_left) &&
+                       balanced?(current_node.is_right) &&
+                       (height(current_node.is_left.data, current_node.is_left) - height(current_node.is_right.data, current_node.is_right)).abs <= 1
+    
+        false
+    end
+
+    def rebalance(current_node = @root, array = [])
+        array = preorder(current_node, createArray=true)
+        puts "\n#{array}"
+        array.sort!.uniq!
+        return array
+
+    end
 end
-array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
-# array = ["A", "B", "C", "D", "E", "F", "G", "I", "J", "K"]
-tree = Bst.new(array)
-p "Raw tree"
-tree.pretty_print
-tree.insert(6)
-p "after insert"
-
-tree.pretty_print
-
-if !(tree.delete(9))
-    p "Didn't find ya"
-end
-
-p "after delete"
-tree.pretty_print
-p tree.find(5)
-
-tree.level_order
-tree.pretty_print
-p "Preorder: #{tree.preorder}"
-p "Inorder: #{tree.inorder}"
-p "Postorder: #{tree.postorder}"
-p " Height: #{tree.height(5)}"
-
-
